@@ -108,8 +108,8 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
     
     const element = document.createElement('div');
     element.dir = isRtl ? 'rtl' : 'ltr';
-    element.style.padding = '10px';
-    element.className = 'pdf-container';
+    element.style.padding = '0'; // Clean start
+    element.className = 'pdf-render-root';
 
     const totalLocsCount = inspector.LocationQueue.length;
     const totalWrksCount = inspector.LocationQueue.reduce((acc, locId) => {
@@ -119,57 +119,59 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
     
     let htmlContent = `
       <style>
-        .pdf-container { font-family: 'Inter', sans-serif; color: #0f172a; }
-        .official-header { border-bottom: 3px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px; }
-        .header-grid { display: flex; justify-content: space-between; align-items: flex-start; }
+        .pdf-render-root { font-family: 'Inter', sans-serif; color: #0f172a; width: 100%; }
+        .official-header { border-bottom: 2px solid #1e293b; padding-bottom: 12px; margin-bottom: 15px; }
+        .header-grid { display: flex; justify-content: space-between; align-items: center; }
         .branding { flex: 1; }
-        .report-title { flex: 1; text-align: center; }
+        .report-title { flex: 2; text-align: center; }
         .report-meta { flex: 1; text-align: ${isRtl ? 'left' : 'right'}; font-size: 8pt; }
         
-        .summary-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 25px; display: flex; gap: 20px; }
-        .summary-item { flex: 1; border-right: 1px solid #e2e8f0; }
+        .summary-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-bottom: 20px; display: flex; gap: 15px; }
+        .summary-item { flex: 1; border-right: 1px solid #e2e8f0; padding: 0 5px; }
         .summary-item:last-child { border-right: none; }
-        .summary-label { font-size: 7pt; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
-        .summary-value { font-size: 11pt; font-weight: 800; }
+        .summary-label { font-size: 7pt; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: 1px; }
+        .summary-value { font-size: 10pt; font-weight: 800; }
 
         .location-block { 
           page-break-inside: avoid; 
-          margin-bottom: 30px; 
+          break-inside: avoid;
+          margin-bottom: 15px; 
           border: 1px solid #cbd5e1; 
           border-radius: 4px; 
           overflow: hidden;
-          break-inside: avoid;
+          display: block; /* Ensures avoid-break works */
         }
         .block-header { 
           background: #1e293b; 
           color: #fff; 
-          padding: 8px 12px; 
+          padding: 6px 10px; 
           display: flex; 
           justify-content: space-between; 
           font-weight: 800; 
-          font-size: 10pt;
+          font-size: 9pt;
         }
         .worker-table { width: 100%; border-collapse: collapse; }
         .worker-table th, .worker-table td { 
           border: 1px solid #e2e8f0; 
-          padding: 6px 8px; 
-          font-size: 8pt; 
+          padding: 4px 6px; 
+          font-size: 7.5pt; 
           text-align: ${isRtl ? 'right' : 'left'}; 
         }
         .worker-table th { background: #f1f5f9; color: #475569; font-weight: 800; }
         .observations { 
-          padding: 10px; 
+          padding: 6px 10px; 
           border-top: 1px solid #e2e8f0; 
-          font-size: 8pt; 
+          font-size: 7.5pt; 
           color: #64748b; 
           background: #fff;
+          font-style: italic;
         }
         .footer { 
           text-align: center; 
-          font-size: 8pt; 
+          font-size: 7pt; 
           color: #94a3b8; 
-          margin-top: 20px; 
-          padding-top: 10px; 
+          margin-top: 15px; 
+          padding-top: 8px; 
           border-top: 1px solid #f1f5f9; 
         }
       </style>
@@ -177,17 +179,16 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
       <div class="official-header">
         <div class="header-grid">
           <div class="branding">
-            <div style="font-weight: 900; font-size: 16pt; color: #4f46e5; line-height: 1.1;">SERVICES INSPECTOR</div>
-            <div style="font-size: 8pt; color: #64748b; font-weight: 800; letter-spacing: 0.5px;">ENVIRONMENTAL SERVICES</div>
-            <div style="font-size: 7pt; color: #94a3b8; font-weight: 500;">SUPPORT SERVICES DIVISION</div>
+            <div style="font-weight: 900; font-size: 14pt; color: #4f46e5; line-height: 1;">SERVICES INSPECTOR</div>
+            <div style="font-size: 7pt; color: #64748b; font-weight: 800; margin-top: 2px;">ENVIRONMENTAL SERVICES</div>
           </div>
           <div class="report-title">
-            <h1 style="font-size: 14pt; margin: 0; font-weight: 800;">${t.officialTitle}</h1>
-            <div style="font-size: 8.5pt; color: #475569; margin-top: 4px;">${t.sheetSubtitle}</div>
+            <h1 style="font-size: 12pt; margin: 0; font-weight: 800;">${t.officialTitle}</h1>
+            <div style="font-size: 7.5pt; color: #475569; margin-top: 2px;">${t.sheetSubtitle}</div>
           </div>
           <div class="report-meta">
             <div style="font-weight: bold;">${t.reportDate}:</div>
-            <div style="font-size: 9pt;">${new Date().toLocaleDateString()}</div>
+            <div style="font-size: 8pt;">${new Date().toLocaleDateString()}</div>
           </div>
         </div>
       </div>
@@ -217,19 +218,19 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
       htmlContent += `
         <div class="location-block">
           <div class="block-header">
-             <div><span style="opacity: 0.7; font-weight: normal;">${t.loc}:</span> ${loc.name}</div>
-             <div>${isRtl ? 'المنطقة' : 'Area'}: ${loc.area}</div>
+             <div><span style="opacity: 0.8; font-weight: normal;">${t.loc}:</span> ${loc.name}</div>
+             <div style="font-size: 8pt;">${isRtl ? 'المنطقة' : 'Area'}: ${loc.area}</div>
           </div>
           
           <table class="worker-table">
             <thead>
               <tr>
-                <th style="width: 30px; text-align: center;">#</th>
-                <th style="width: 80px;">${t.workerId}</th>
+                <th style="width: 25px; text-align: center;">#</th>
+                <th style="width: 70px;">${t.workerId}</th>
                 <th>${t.workerName}</th>
-                <th>${t.nationality}</th>
-                <th>${t.company}</th>
-                <th style="width: 80px; text-align: center;">${t.signature}</th>
+                <th style="width: 70px;">${t.nationality}</th>
+                <th style="width: 70px;">${t.company}</th>
+                <th style="width: 60px; text-align: center;">${t.signature}</th>
               </tr>
             </thead>
             <tbody>
@@ -240,11 +241,11 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
         htmlContent += `
           <tr>
             <td style="text-align: center; color: #94a3b8;">${idx + 1}</td>
-            <td style="font-weight: 800;">${wid}</td>
+            <td style="font-weight: 800; font-family: monospace;">${wid}</td>
             <td style="font-weight: 800;">${worker?.Worker_Name || ''}</td>
             <td>${worker?.Nationality || '-'}</td>
             <td>${worker?.Company || '-'}</td>
-            <td style="background: #fafafa;"></td>
+            <td style="background: #fafafa; border: 1px solid #e2e8f0;"></td>
           </tr>
         `;
       });
@@ -253,7 +254,7 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
             </tbody>
           </table>
           <div class="observations">
-            ${isRtl ? 'ملاحظات المعاينة الميدانية:' : 'Field Observations:'} _________________________________________________________________________
+            ${isRtl ? 'الملاحظات:' : 'Observations:'} __________________________________________________________________________________
           </div>
         </div>
       `;
@@ -269,8 +270,8 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
     element.innerHTML = htmlContent;
 
     const opt = {
-      margin: [15, 12, 15, 12],
-      filename: `Report_${inspector.Inspector_Name.replace(/\s+/g, '_')}.pdf`,
+      margin: [15, 10, 15, 10], // Margins: Top, Left, Bottom, Right
+      filename: `VisitRecord_${inspector.Inspector_Name.replace(/\s+/g, '_')}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
@@ -280,8 +281,8 @@ const ReportingScreen: React.FC<Props> = ({ language, inspectors, visits, areas,
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { 
-        mode: ['avoid-all', 'css', 'legacy'],
-        before: '.location-block' 
+        mode: ['avoid-all', 'css', 'legacy']
+        // Removed 'before: .location-block' to prevent empty first page
       }
     };
 
