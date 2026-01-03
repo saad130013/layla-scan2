@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Inspector, VisitRecord, AreaData, Worker, Language, TRANSLATIONS } from '../types';
 import { FileSpreadsheet, Printer, CheckCircle2, Clock, AlertCircle, TrendingUp, Download, Loader2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+// @ts-ignore
 import html2pdf from 'html2pdf.js';
 
 interface Props {

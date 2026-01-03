@@ -100,7 +100,7 @@ const InspectionDayView: React.FC<Props> = ({ language, inspectors, areas, worke
     setActiveLocationId(null);
   };
 
-  if (!selectedInspectorId) {
+  if (!selectedInspectorId || !selectedInspector) {
     return (
       <div className="space-y-6">
         <header>
