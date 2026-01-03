@@ -1,0 +1,7 @@
+{
+  "name": "v1OpsCheck: Inspection Scheduling System",
+  "description": "A high-performance, data-driven application for managing weekly inspector rotations, assignments, and reporting based on workforce baseline data.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
